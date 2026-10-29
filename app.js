@@ -11,6 +11,70 @@ let EDIT_PRESET_ID = null;
 let TIPO_SEL = "CIARA";
 let TIPO_PRESET_SEL = "CIARA";
 
+// ===== Autenticación =====
+function showAuthMsg(msg) {
+  document.getElementById("auth-msg").textContent = msg;
+}
+
+async function crearCuenta() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email || !password || password.length < 6) {
+    showAuthMsg("Email válido y contraseña de mínimo 6 caracteres."); return;
+  }
+  showAuthMsg("Creando cuenta...");
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) { showAuthMsg(error.message); return; }
+  if (data.session) {
+    // Confirmación de email desactivada en el proyecto: entra directo
+    onLoginSuccess();
+  } else {
+    showAuthMsg("Cuenta creada. Revisa tu email para confirmarla y luego pulsa Iniciar sesión.");
+  }
+}
+
+async function iniciarSesion() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email || !password) { showAuthMsg("Indica email y contraseña."); return; }
+  showAuthMsg("Entrando...");
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { showAuthMsg(error.message); return; }
+  onLoginSuccess();
+}
+
+async function cerrarSesion() {
+  await sb.auth.signOut();
+  document.getElementById("view-login").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+  document.querySelector("nav.bottom").style.display = "none";
+  document.getElementById("auth-password").value = "";
+  showAuthMsg("");
+}
+
+function onLoginSuccess() {
+  document.getElementById("view-login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.querySelector("nav.bottom").style.display = "flex";
+  loadAll();
+}
+
+async function checkSession() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    document.getElementById("config-email").textContent = data.session.user.email;
+    onLoginSuccess();
+  } else {
+    document.getElementById("view-login").style.display = "flex";
+    document.getElementById("app").style.display = "none";
+    document.querySelector("nav.bottom").style.display = "none";
+  }
+}
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (session) document.getElementById("config-email").textContent = session.user.email;
+});
+
 // ===== Utilidades =====
 function fmtEUR(n) {
   return (Number(n) || 0).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
@@ -327,4 +391,4 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
-loadAll();
+checkSession();

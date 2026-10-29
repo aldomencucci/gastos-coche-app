@@ -106,7 +106,24 @@
 </style>
 </head>
 <body>
-<div id="app">
+
+<!-- VIEW: LOGIN -->
+<div id="view-login" style="display:flex; min-height:100vh; align-items:center; justify-content:center; padding:24px;">
+  <div style="width:100%; max-width:360px;">
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="font-size:40px; margin-bottom:8px;">🚗</div>
+      <h1 style="font-size:19px; margin:0;">Gastos Coche</h1>
+      <p style="color:var(--text-dim); font-size:13px; margin-top:6px;">Acceso privado</p>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="auth-email" autocomplete="username" placeholder="tu@email.com"></div>
+    <div class="field"><label>Contraseña</label><input type="password" id="auth-password" autocomplete="current-password"></div>
+    <button class="btn-primary" onclick="iniciarSesion()">Iniciar sesión</button>
+    <button class="btn-secondary" onclick="crearCuenta()">Crear cuenta (primera vez)</button>
+    <p id="auth-msg" style="text-align:center; font-size:12.5px; color:var(--text-dim); margin-top:14px; min-height:18px;"></p>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
   <header>
     <h1>🚗 Gastos Coche</h1>
   </header>
@@ -160,10 +177,14 @@
     </div>
     <div class="section-title">Viajes predeterminados</div>
     <div id="lista-presets-config"></div>
+
+    <div class="section-title">Cuenta</div>
+    <p style="font-size:13px; color:var(--text-dim); margin:0 0 10px;" id="config-email"></p>
+    <button class="btn-secondary" onclick="cerrarSesion()">Cerrar sesión</button>
   </div>
 </div>
 
-<nav class="bottom">
+<nav class="bottom" style="display:none;">
   <div class="nav-item active" data-view="view-home" onclick="switchView('view-home')">
     <span class="icon">⛽</span>Registrar
   </div>
